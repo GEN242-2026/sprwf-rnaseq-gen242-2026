@@ -504,10 +504,12 @@ appendStep(sal) <- LineWise(
 )
 ```
 
+
+
 ## Read quantification
 
 Reads overlapping with annotation ranges of interest are counted for
-each sample using the `summarizeOverlaps` function [@Lawrence2013-kt]. 
+each sample using the `featureCounts` function. 
 Most often the read counting is preformed for exonic gene regions. This can be
 done in a strand-specific or non-strand-specific manner, while accounting for overlaps 
 among adjacent genes or ignoring them. Subsequently, the expression
@@ -531,52 +533,57 @@ appendStep(sal) <- LineWise(
     dependency = "hisat2_mapping")
 ```
 
+## Read Counting with `featureCounts` and `summarizeOverlaps`
 
-### Read counting with `summarizeOverlaps` 
+Reads overlapping with annotation ranges of interest are counted for each
+sample using the `featureCounts` function from the `Rsubread` package
+[@Liao2014-bn]. Most often the read counting is performed for exonic gene
+regions. The annotation ranges are derived from the `TxDb` object created
+in the previous step. `featureCounts` accepts `GRangesList` objects directly
+via the `annot.ext` argument, making it straightforward to use the
+`eByg` object (exons grouped by gene) as the feature annotation without
+any conversion. Count tables and the corresponding RPKM tables are written
+to files in the project's `results` directory.
 
-The provided example employs non-strand-specific read counting while
-disregarding overlaps between different genes. As normalization the example uses
-*reads per kilobase per million mapped reads* (RPKM). The raw read count table
-(`countDFeByg.xls`) and the corresponding RPKM table (`rpkmDFeByg.xls`) are written
-to distinct files in the project's results directory. Parallelization across
-multiple CPU cores is achieved with the `BiocParallel` package. When supplying a
-`BamFileList` as illustrated below, `the summarizeOverlaps` method defaults to
-employing `bplapply` and the register interface from `BiocParallel`. The
-`MulticoreParam` will utilize the number of cores returned by
-`parallel::detectCores` if the number of workers is left unspecified. For
-further information, refer to the help documentation by typing
-`help("summarizeOverlaps")`.
-
-```{r read_counting, eval=FALSE, spr=TRUE}
+```{r read_counting_fc, eval=FALSE, spr=TRUE}
 appendStep(sal) <- LineWise(
     code = {
-        library(GenomicFeatures); library(BiocParallel)
-        txdb <- loadDb("./data/tair10.sqlite")
-        outpaths <- getColumn(sal, step = "hisat2_mapping", "outfiles", column = "samtools_sort_bam")
-        eByg <- exonsBy(txdb, by = c("gene"))
-        bfl <- BamFileList(outpaths, yieldSize = 50000, index = character())
-        multicoreParam <- MulticoreParam(workers = 4); register(multicoreParam); registered()
-        counteByg <- bplapply(bfl, function(x) summarizeOverlaps(eByg, x, mode = "Union", 
-                                                                 ignore.strand = TRUE, 
-                                                                 inter.feature = FALSE, 
-                                                                 singleEnd = FALSE, 
-                                                                 BPPARAM = multicoreParam))
-        countDFeByg <- sapply(seq(along=counteByg), function(x) assays(counteByg[[x]])$counts)
-        rownames(countDFeByg) <- names(rowRanges(counteByg[[1]])); colnames(countDFeByg) <- names(bfl)
-        rpkmDFeByg <- apply(countDFeByg, 2, function(x) returnRPKM(counts=x, ranges=eByg))
-        write.table(countDFeByg, "results/countDFeByg.xls", col.names=NA, quote=FALSE, sep="\t")
-        write.table(rpkmDFeByg, "results/rpkmDFeByg.xls", col.names=NA, quote=FALSE, sep="\t")
-        ## Creating a SummarizedExperiment object
-        colData <- data.frame(row.names=SampleName(sal, "hisat2_mapping"), 
-                              condition=getColumn(sal, "hisat2_mapping", position = "targetsWF", column = "Factor"))
-        colData$condition <- factor(colData$condition)
-        countDF_se <- SummarizedExperiment::SummarizedExperiment(assays = countDFeByg, 
-                                                                 colData = colData)
-        ## Add results as SummarizedExperiment to the workflow object
-        SE(sal, "read_counting") <- countDF_se
-        }, 
-    step_name = "read_counting", 
-    dependency = "create_db")
+        library(GenomicFeatures)
+        library(Rsubread)
+        txdb     <- loadDb("./data/tair10.sqlite")
+        eByg     <- exonsBy(txdb, by = "gene")
+        outpaths <- getColumn(sal, step = "hisat2_mapping", "outfiles",
+                              column = "samtools_sort_bam")
+        ## featureCounts accepts GRangesList directly via annot.ext
+        ## strandSpecific=0: unstranded; 1: sense strand; 2: antisense strand
+        ## Set strandSpecific=1 or 2 for strand-specific library preparations
+        fc <- featureCounts(
+            files                  = outpaths,
+            annot.ext              = eByg,
+            isGTFAnnotationFile    = FALSE,
+            useMetaFeatures        = TRUE,
+            strandSpecific         = 0,
+            isPairedEnd            = TRUE,
+            countMultiMappingReads = FALSE,
+            nthreads               = 4
+        )
+        countDFeByg <- fc$counts
+        ## Assign sample names from outpaths
+        colnames(countDFeByg) <- names(outpaths)
+        ## Compute RPKM values
+        ## eByg widths: sum of exon widths per gene for length normalization
+        geneLengths <- sum(width(reduce(eByg)))
+        rpkmDFeByg  <- apply(countDFeByg, 2, function(x)
+            returnRPKM(counts = x, ranges = eByg))
+        ## Write count and RPKM tables to results directory
+        write.table(countDFeByg, "results/countDFeByg.xls",
+                    col.names = NA, quote = FALSE, sep = "\t")
+        write.table(rpkmDFeByg, "results/rpkmDFeByg.xls",
+                    col.names = NA, quote = FALSE, sep = "\t")
+    },
+    step_name = "read_counting",
+    dependency = "create_db"
+)
 ```
 
 Importantly, when conducting statistical differential expression or abundance analysis using

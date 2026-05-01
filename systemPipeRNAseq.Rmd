@@ -599,7 +599,6 @@ appendStep(sal) <- LineWise(
                                                                  colData = colData)
         ## Add results as SummarizedExperiment to the workflow object
         SE(sal, "read_counting") <- countDF_se
-                    col.names = NA, quote = FALSE, sep = "\t")
     },
     step_name = "read_counting",
     dependency = "create_db"

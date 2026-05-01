@@ -40,7 +40,7 @@ The following will:
 
 ```
 library(systemPipeRdata)
-genWorkenvir_gh(url = "https://github.com/GEN242-2026/sprwf-rnaseq-gen242-2026.git", mydirname = "sprwf-rnaseq")
+genWorkenvir_gh(url = "https://github.com/GEN242-2026/sprwf-rnaseq-gen242-2026.git", mydirname = "rnaseq")
 setwd("sprwf-rnaseq")
 getParam_gh()
 getData_gh() # omit if sample data is not needed

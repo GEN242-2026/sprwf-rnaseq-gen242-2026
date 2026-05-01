@@ -180,7 +180,9 @@ at any stage of the loading or run process by typing `sal`.
 
 ```{r project_rnaseq, eval=FALSE}
 library(systemPipeR)
-sal <- SPRproject() 
+sal <- SPRproject()
+# sal <- SPRproject(resume=TRUE, load.envir=TRUE) # Restarts workflow.
+# sal <- SPRproject(overwrite=TRUE) # Resets workflow, meaning previous work will be erased
 sal <- importWF(sal, file_path = "systemPipeRNAseq.Rmd", verbose = FALSE)
 sal
 ```
@@ -552,6 +554,16 @@ appendStep(sal) <- LineWise(
         library(Rsubread)
         txdb     <- loadDb("./data/tair10.sqlite")
         eByg     <- exonsBy(txdb, by = "gene")
+        ## Helper: convert GRangesList or GRanges to data.frame for featureCounts 
+        grl_to_df <- function(grl) {
+            gr <- unlist(grl)
+            data.frame(GeneID = names(gr),
+                       Chr    = as.character(seqnames(gr)),
+                       Start  = start(gr),
+                       End    = end(gr),
+                       Strand = as.character(strand(gr)),
+                       stringsAsFactors = FALSE)
+        } 
         outpaths <- getColumn(sal, step = "hisat2_mapping", "outfiles",
                               column = "samtools_sort_bam")
         ## featureCounts accepts GRangesList directly via annot.ext
@@ -559,7 +571,7 @@ appendStep(sal) <- LineWise(
         ## Set strandSpecific=1 or 2 for strand-specific library preparations
         fc <- featureCounts(
             files                  = outpaths,
-            annot.ext              = eByg,
+            annot.ext              = grl_to_df(eByg),
             isGTFAnnotationFile    = FALSE,
             useMetaFeatures        = TRUE,
             strandSpecific         = 0,

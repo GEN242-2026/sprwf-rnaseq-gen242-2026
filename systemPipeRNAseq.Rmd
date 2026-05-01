@@ -533,7 +533,7 @@ appendStep(sal) <- LineWise(
     dependency = "hisat2_mapping")
 ```
 
-## Read Counting with `featureCounts` and `summarizeOverlaps`
+### Read Counting with `featureCounts`
 
 Reads overlapping with annotation ranges of interest are counted for each
 sample using the `featureCounts` function from the `Rsubread` package

@@ -181,7 +181,7 @@ at any stage of the loading or run process by typing `sal`.
 ```{r project_rnaseq, eval=FALSE}
 library(systemPipeR)
 sal <- SPRproject()
-sal <- SPRproject(resume=TRUE, load.envir=TRUE) # Restarts workflow.
+# sal <- SPRproject(resume=TRUE, load.envir=TRUE) # Restarts workflow.
 # sal <- SPRproject(overwrite=TRUE) # Resets workflow, meaning previous work will be erased
 sal <- importWF(sal, file_path = "systemPipeRNAseq.Rmd", verbose = FALSE)
 sal
@@ -223,7 +223,6 @@ based on log information that `systemPipeR` collects during workflow runs.
 
 ```{r report_rnaseq, eval=FALSE}
 # Scientific report
-sal <- renderReport(sal)
 rmarkdown::render("systemPipeRNAseq.Rmd", clean = TRUE, output_format = "BiocStyle::html_document") 
 
 # Technical (log) report

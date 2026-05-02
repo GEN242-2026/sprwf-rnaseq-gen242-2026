@@ -2119,9 +2119,9 @@ An overview of the workflow steps and their status information can be returned
 at any stage of the loading or run process by typing <code>sal</code>.</p>
 <pre class="r"><code>library(systemPipeR)
 sal &lt;- SPRproject()
-sal &lt;- SPRproject(resume = TRUE, load.envir = TRUE)  # Restarts workflow.
-# sal &lt;- SPRproject(overwrite=TRUE) # Resets workflow,
-# meaning previous work will be erased
+# sal &lt;- SPRproject(resume=TRUE, load.envir=TRUE) #
+# Restarts workflow.  sal &lt;- SPRproject(overwrite=TRUE) #
+# Resets workflow, meaning previous work will be erased
 sal &lt;- importWF(sal, file_path = &quot;systemPipeRNAseq.Rmd&quot;, verbose = FALSE)
 sal</code></pre>
 <p>After loading the workflow into <code>sal</code>, it can be executed from start to finish
@@ -2151,7 +2151,6 @@ Figure 1: <span class="caption-title">Toplogy graph of RNA-Seq workflow</span><b
 with the <code>render</code> function of the <code>rmarkdown</code> package. The technical reports are
 based on log information that <code>systemPipeR</code> collects during workflow runs.</p>
 <pre class="r"><code># Scientific report
-sal &lt;- renderReport(sal)
 rmarkdown::render(&quot;systemPipeRNAseq.Rmd&quot;, clean = TRUE, output_format = &quot;BiocStyle::html_document&quot;)
 
 # Technical (log) report

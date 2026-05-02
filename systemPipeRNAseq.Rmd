@@ -181,7 +181,7 @@ at any stage of the loading or run process by typing `sal`.
 ```{r project_rnaseq, eval=FALSE}
 library(systemPipeR)
 sal <- SPRproject()
-# sal <- SPRproject(resume=TRUE, load.envir=TRUE) # Restarts workflow.
+sal <- SPRproject(resume=TRUE, load.envir=TRUE) # Restarts workflow.
 # sal <- SPRproject(overwrite=TRUE) # Resets workflow, meaning previous work will be erased
 sal <- importWF(sal, file_path = "systemPipeRNAseq.Rmd", verbose = FALSE)
 sal
@@ -539,7 +539,7 @@ appendStep(sal) <- LineWise(
 
 Reads overlapping with annotation ranges of interest are counted for each
 sample using the `featureCounts` function from the `Rsubread` package
-[@Liao2014-bn]. Most often the read counting is performed for exonic gene
+[@Liao2013-bn]. Most often the read counting is performed for exonic gene
 regions. The annotation ranges are derived from the `TxDb` object created
 in the previous step. `featureCounts` accepts `GRangesList` objects directly
 via the `annot.ext` argument, making it straightforward to use the

@@ -1,7 +1,7 @@
 ## RNA-Seq Workflow Template for systemPipeR WMS
 
 <p align="right">
-  <a href="https://systempipe.org/sprwf-rnaseq-gen242-2026/systemPipeRNAseq.html">
+  <a href="https://gen242-2026.github.io/sprwf-rnaseq-gen242-2026/systemPipeRNAseq.html">
     <img src="https://img.shields.io/badge/TUTORIAL-blue?style=for-the-badge&logo=gitbook&logoColor=white" alt="Tutorial Badge">
   </a>
 </p>

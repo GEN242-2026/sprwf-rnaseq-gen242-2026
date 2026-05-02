@@ -547,7 +547,7 @@ via the `annot.ext` argument, making it straightforward to use the
 any conversion. Count tables and the corresponding RPKM tables are written
 to files in the project's `results` directory.
 
-```{r read_counting_fc, eval=FALSE, spr=TRUE}
+```{r read_counting, eval=FALSE, spr=TRUE}
 appendStep(sal) <- LineWise(
     code = {
         library(GenomicFeatures)

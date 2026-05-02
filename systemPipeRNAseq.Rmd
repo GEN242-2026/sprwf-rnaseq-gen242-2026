@@ -591,15 +591,16 @@ appendStep(sal) <- LineWise(
         write.table(countDFeByg, "results/countDFeByg.xls", col.names = NA, quote = FALSE, sep = "\t")
         write.table(rpkmDFeByg, "results/rpkmDFeByg.xls", col.names=NA, quote=FALSE, sep="\t")
         ## Creating a SummarizedExperiment object
-        colData <- data.frame(row.names=SampleName(sal, "hisat2_mapping"), condition=getColumn(sal, "hisat2_mapping", position = "targetsWF", column = "Factor"))
+        colData <- data.frame(row.names=SampleName(sal, "hisat2_mapping"), 
+                              condition=getColumn(sal, "hisat2_mapping", position = "targetsWF", column = "Factor"))
         colData$condition <- factor(colData$condition)
-        countDF_se <- SummarizedExperiment::SummarizedExperiment(assays = countDFeByg, colData = colData)
+        countDF_se <- SummarizedExperiment::SummarizedExperiment(assays = countDFeByg, 
+                                                                 colData = colData)
         ## Add results as SummarizedExperiment to the workflow object
         SE(sal, "read_counting") <- countDF_se
-    },
-    step_name = "read_counting",
-    dependency = "create_db"
-)
+        }, 
+    step_name = "read_counting", 
+    dependency = "create_db")
 ```
 
 Importantly, when conducting statistical differential expression or abundance analysis using

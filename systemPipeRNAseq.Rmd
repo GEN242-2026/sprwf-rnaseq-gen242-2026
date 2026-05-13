@@ -367,16 +367,16 @@ in the quality plots can be found in the corresponding help file (see
 appendStep(sal) <- LineWise(code = {
                 fastq <- getColumn(sal, step = "preprocessing", "targetsWF", column = 1)
                 fqlist <- seeFastq(fastq = fastq, batchsize = 10000, klength = 8)
-                png("./results/fastqReport.png", height = 162, width = 288 * length(fqlist))
+                png("./results/fastqReport.png", height = 1500, width = 330 * length(fqlist))
                 seeFastqPlot(fqlist)
                 dev.off()
                 }, step_name = "fastq_report", 
                 dependency = "preprocessing")
 ``` 
 
-![](results/fastqReport.png)
-
-<div align="center">Figure 1: FASTQ quality report for 18 samples</div></br>
+```{r seefastqplot, eval=TRUE, warning= FALSE, echo=FALSE, out.height="150px", fig.align = "center", fig.cap= "FASTQ quality report for 18 samples.", warning=FALSE}
+knitr::include_graphics("results/fastqReport.png")
+```
 
 ## Short read alignments
 
@@ -434,8 +434,7 @@ $hisat2_mapping
 $hisat2_mapping$M1A
 $hisat2_mapping$M1A$hisat2
 [1] "hisat2 -S ./results/M1A.sam  -x ./data/tair10.fasta  -k 1  --min-intronlen
-30  --max-intronlen 3000  -1 ./results/M1A_1.fastq_trim.gz -2 ./results/M1A_2.fa
-stq_trim.gz --threads 4"
+30  --max-intronlen 3000  -1 ./results/preprocessing/M1A_1.fastq_trim.gz -2 ./results/preprocessing/M1A_2.fastq_trim.gz --threads 4"
 
 $hisat2_mapping$M1A$`samtools-view`
 [1] "samtools view -bS -o ./results/M1A.bam  ./results/M1A.sam "
@@ -526,7 +525,7 @@ be performed once for a specific version of an annotation file.
 ```{r create_db, eval=FALSE, spr=TRUE}
 appendStep(sal) <- LineWise(
     code = {
-        library(GenomicFeatures)
+        library(txdbmaker)
         txdb <- suppressWarnings(makeTxDbFromGFF(file="data/tair10.gff", format="gff", dataSource="TAIR", organism="Arabidopsis thaliana"))
         saveDb(txdb, file="./data/tair10.sqlite")
         }, 

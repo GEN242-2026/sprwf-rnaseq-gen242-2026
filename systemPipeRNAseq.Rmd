@@ -129,18 +129,21 @@ __Default analysis steps__
 ## Load workflow environment {#load-wf}
 
 The environment for this RNA-Seq workflow is auto-generated below with the 
-`genWorkenvir` function (selected under `workflow="rnaseq"`). It is fully populated 
+`genWorkenvir_gh` function. It is fully populated 
 with a small test data set, including FASTQ files, reference genome and annotation data. The name of the
 resulting workflow directory can be specified under the `mydirname` argument.
 The default `NULL` uses the name of the chosen workflow. An error is issued if
 a directory of the same name and path exists already. After this, the user’s R
 session needs to be directed into the resulting `rnaseq` directory (here with
-`setwd`). 
+`setwd`) and the `systemPipeRNAseq.Rmd` source file opened that provides the code 
+of this workflow. This file is located within the `rnaseq` directory.
 
 ```{r generate_workenvir, eval=FALSE}
 library(systemPipeRdata)
-genWorkenvir(workflow = "rnaseq", mydirname = "rnaseq")
+genWorkenvir_gh(url = "https://github.com/GEN242-2026/sprwf-rnaseq-gen242-2026.git", mydirname = "rnaseq")
 setwd("rnaseq")
+getParam_gh()
+getData_gh() 
 ```
 
 ### Input data: `targets` file
